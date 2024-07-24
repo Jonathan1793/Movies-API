@@ -3,10 +3,11 @@ const myKey = config.MY_KEY;
 const readAccessToken = config.API_READ_ACCESS_TOKEN;
 const movieListContainer = document.querySelector(".movie-list");
 const favoriteMoviesArr = [];
-let maxDisplayMovies = 31;
+let maxDisplayMovies = 40;
 const movies = [];
+const moviesPromises = [];
 
-/*API Authentication */
+/*API Authentication options */
 
 const options = {
   method: "GET",
@@ -18,21 +19,78 @@ const options = {
 
 /*requesting API Data*/
 
-const getMovieList = async () => {
-  for (i = 1; i < maxDisplayMovies; i++) {
-    await fetch(`https://api.themoviedb.org/3/movie/${i}`, options)
-      .then((res) => res.json())
-      .then((res) =>
-        res.id !== undefined && res.poster_path !== null
-          ? movies.push(res)
-          : maxDisplayMovies++
-      )
-      .catch((err) => console.error(err));
-  }
-  movies.map((movie) => generateCard(movie));
+const makeAPICall = async (index) => {
+  return await fetch(`https://api.themoviedb.org/3/movie/${index}`, options)
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error(`Movie was not in DataBase`);
+      } else {
+        return res.json();
+      }
+    })
+    .catch((error) => console.log(error));
 };
 
+const getMovieList = async (maxMovies) => {
+  console.log(
+    "this is the total amount of movies that is going to display: " + maxMovies
+  );
+  for (i = 1; i < maxMovies; i++) {
+    console.log("max movies inside the for loop: " + maxMovies);
+    if (favoriteMoviesArr.find((movie) => movie.id == i)) {
+      continue;
+    } else {
+      makeAPICall(i).then((movie) => generateCard(movie));
+    }
+  }
+
+  // await Promise.allSettled(moviesPromises)
+  //   .then((allMovies) =>
+  //     allMovies.map((movie) =>
+  //       movie.value
+  //         .json()
+  //         .then((movie) => {
+  //           if (movie.success === false) {
+  //             console.log("movie not found");
+  //           } else if (
+  //             favoriteMoviesArr
+  //               .map((moviefaved) => moviefaved.id)
+  //               .includes(movie.id)
+  //           ) {
+  //             movies.push(movie);
+  //           }
+  //         })
+  //         .catch((err) => console.log(err))
+  //     )
+  //   )
+  //   .catch((err) => console.log(err));
+
+  // await movies.map((movie) => console.log(movie));
+};
+
+// const getMovieList = async () => {
+//   for (i = 1; i < maxDisplayMovies; i++) {
+//     return (moviesPromises = fetch(
+//       `https://api.themoviedb.org/3/movie/${i}`,
+//       options
+//     )
+//       .then((res) => res.json())
+//       .then((res) =>
+//         res.id !== undefined && res.poster_path !== null
+//           ? res //movies.push(res)
+//           : maxDisplayMovies++
+//       )
+//       .catch((err) => console.error(err)));
+//   }
+//   console.log("API call");
+//   console.log(moviesPromises);
+//   movies.map((movie) => generateCard(movie));
+// };
+
 const generateCard = (movie) => {
+  if (!movie) {
+    return "an easy way out but maybe change it for something else?";
+  }
   //creating elements
   const heartIcon = document.createElement("i");
   const movieCard = document.createElement("div");
@@ -64,13 +122,21 @@ const generateCard = (movie) => {
   //modifying content of the element
   movieCard.setAttribute("id", movie.id);
   movieTitle.innerHTML = movie.original_title;
-  movieSummary.innerHTML = movie.overview;
-  movieCard.style.backgroundImage = `url("https://image.tmdb.org/t/p/w500${movie.poster_path}")`;
+  if (movie.overview.length === 0) {
+    movieSummary.innerHTML = "NO DESCRIPTION FOUND";
+  } else {
+    movieSummary.innerHTML = movie.overview;
+  }
+  if (movie.poster_path === null) {
+    movieCard.style.backgroundImage = `url("https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg")`;
+  } else {
+    movieCard.style.backgroundImage = `url("https://image.tmdb.org/t/p/w500${movie.poster_path}")`;
+  }
   heartIcon.addEventListener("click", (event) => {
     addToFavoritesHandler(event.target.parentElement);
   });
 };
-getMovieList();
+getMovieList(maxDisplayMovies);
 
 /*this next function handles the add movies to the favorites pile it does the following
 
@@ -87,15 +153,20 @@ and to display the correct movies in the home page so it doesn't include any mov
 already in the array */
 
 const addToFavoritesHandler = (favoritedMovie) => {
-  if (favoriteMoviesArr.length === 0) {
+  console.log("NOTICE ME: " + movieListContainer.childNodes.length);
+  maxDisplayMovies += 2;
+  console.log(maxDisplayMovies);
+  if (!favoriteMoviesArr.includes(favoritedMovie)) {
     favoriteMoviesArr.push(favoritedMovie);
-  } else if (
-    favoriteMoviesArr.map((movie) => movie.id).includes(favoritedMovie.id)
-  ) {
-    alert(
-      `the movie ${favoritedMovie.children[2].children[0].innerHTML} is already in favorites`
-    );
-  } else {
-    favoriteMoviesArr.push(favoritedMovie);
+    movieListContainer.innerHTML = "";
+    console.log(favoriteMoviesArr);
+    getMovieList(maxDisplayMovies);
   }
+
+  // } else if (
+  //   favoriteMoviesArr.map((movie) => movie.id).includes(favoritedMovie.id)
+  // ) {
+  //   alert(
+  //     `the movie ${favoritedMovie.children[2].children[0].innerHTML} is already in favorites`
+  //   );
 };
