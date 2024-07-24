@@ -1,14 +1,16 @@
 /*global variables*/
 const myKey = config.MY_KEY;
 const readAccessToken = config.API_READ_ACCESS_TOKEN;
+const favoriteListButton = document.getElementById("favorites-button");
+const titleOfPage = document.querySelector(".title");
 const movieListContainer = document.querySelector(".movie-list");
 const favoriteMoviesArr = [];
 let maxDisplayMovies = 40;
 const movies = [];
 const moviesPromises = [];
+let isFavoritesOn = false;
 
 /*API Authentication options */
-
 const options = {
   method: "GET",
   headers: {
@@ -43,50 +45,43 @@ const getMovieList = async (maxMovies) => {
       makeAPICall(i).then((movie) => generateCard(movie));
     }
   }
-
-  // await Promise.allSettled(moviesPromises)
-  //   .then((allMovies) =>
-  //     allMovies.map((movie) =>
-  //       movie.value
-  //         .json()
-  //         .then((movie) => {
-  //           if (movie.success === false) {
-  //             console.log("movie not found");
-  //           } else if (
-  //             favoriteMoviesArr
-  //               .map((moviefaved) => moviefaved.id)
-  //               .includes(movie.id)
-  //           ) {
-  //             movies.push(movie);
-  //           }
-  //         })
-  //         .catch((err) => console.log(err))
-  //     )
-  //   )
-  //   .catch((err) => console.log(err));
-
-  // await movies.map((movie) => console.log(movie));
+};
+const displayFavoritesHandler = (isFavoritesOn) => {
+  favoriteListButton.classList.add("favorites-ON");
+  console.log("faves is ON ");
+  titleOfPage.innerHTML = "Your Favorite Movies Are: ";
+  movieListContainer.innerHTML = "";
+  console.log("the length of the array is: " + favoriteMoviesArr.length);
+  favoriteMoviesArr.map((movie) => {
+    makeAPICall(movie.id).then((res) => generateCard(res));
+  });
 };
 
-// const getMovieList = async () => {
-//   for (i = 1; i < maxDisplayMovies; i++) {
-//     return (moviesPromises = fetch(
-//       `https://api.themoviedb.org/3/movie/${i}`,
-//       options
-//     )
-//       .then((res) => res.json())
-//       .then((res) =>
-//         res.id !== undefined && res.poster_path !== null
-//           ? res //movies.push(res)
-//           : maxDisplayMovies++
-//       )
-//       .catch((err) => console.error(err)));
-//   }
-//   console.log("API call");
-//   console.log(moviesPromises);
-//   movies.map((movie) => generateCard(movie));
-// };
+favoriteListButton.addEventListener("click", () => {
+  if (!isFavoritesOn) {
+    displayFavoritesHandler(isFavoritesOn);
+    isFavoritesOn = true;
+  } else {
+    favoriteListButton.classList.remove("favorites-ON");
+    console.log("FAVES IS OFF");
+    movieListContainer.innerHTML = "";
+    getMovieList(30);
+    titleOfPage.innerHTML = "Back To Normal Pages";
+    isFavoritesOn = false;
+  }
+});
 
+/**Generate Card Function Starts here:
+ *  the function receives an object containing the movie information that we got from
+ * @function getMovieList and we display that information on each created dynamically
+ * created element
+ *
+ * We are only using 3 values from the data we received. this being:
+ * @param movie.title to display the movie title
+ * @param movie.overview to display the movie description
+ * @param movie.poster_path to get the link to the cover image used in each card
+ *
+ */
 const generateCard = (movie) => {
   if (!movie) {
     return "an easy way out but maybe change it for something else?";
@@ -101,8 +96,15 @@ const generateCard = (movie) => {
   const movieSummary = document.createElement("p");
 
   //adding necessary classes to elements created
-  heartIcon.classList.add("fa-solid");
-  heartIcon.classList.add("fa-heart");
+
+  if (favoriteMoviesArr.find((favoriteMovie) => favoriteMovie.id == movie.id)) {
+    heartIcon.classList.add("fa-solid");
+    heartIcon.classList.add("fa-heart-crack");
+  } else {
+    heartIcon.classList.add("fa-solid");
+    heartIcon.classList.add("fa-heart");
+  }
+
   movieCard.classList.add("movie-card");
   moviePoster.classList.add("movie-poster");
   movieImg.classList.add("movie-img");
@@ -138,7 +140,7 @@ const generateCard = (movie) => {
 };
 getMovieList(maxDisplayMovies);
 
-/*this next function handles the add movies to the favorites pile it does the following
+/**this next function handles the add movies to the favorites pile it does the following
 
 1.- it checks if the array of favorite movies @FavoriteMoviesArr is empty:  
     if it is: it adds the selected movie to the array
@@ -155,18 +157,27 @@ already in the array */
 const addToFavoritesHandler = (favoritedMovie) => {
   console.log("NOTICE ME: " + movieListContainer.childNodes.length);
   maxDisplayMovies += 2;
-  console.log(maxDisplayMovies);
-  if (!favoriteMoviesArr.includes(favoritedMovie)) {
+  if (
+    !favoriteMoviesArr.find(
+      (movieInFavorites) => movieInFavorites.id == favoritedMovie.id
+    )
+  ) {
     favoriteMoviesArr.push(favoritedMovie);
     movieListContainer.innerHTML = "";
     console.log(favoriteMoviesArr);
     getMovieList(maxDisplayMovies);
+  } else {
+    console.log("we are deleting the movie");
+    console.log(favoriteMoviesArr);
+    console.log(
+      favoriteMoviesArr.splice(
+        favoriteMoviesArr.indexOf(
+          favoriteMoviesArr.find((item) => item.id == favoritedMovie.id)
+        ),
+        1
+      )
+    );
+    displayFavoritesHandler(isFavoritesOn);
+    console.log(favoriteMoviesArr);
   }
-
-  // } else if (
-  //   favoriteMoviesArr.map((movie) => movie.id).includes(favoritedMovie.id)
-  // ) {
-  //   alert(
-  //     `the movie ${favoritedMovie.children[2].children[0].innerHTML} is already in favorites`
-  //   );
 };
