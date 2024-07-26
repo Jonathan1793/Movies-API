@@ -4,10 +4,12 @@ const readAccessToken = config.API_READ_ACCESS_TOKEN;
 const favoriteListButton = document.getElementById("favorites-button");
 const titleOfPage = document.querySelector(".title");
 const movieListContainer = document.querySelector(".movie-list");
+const orderAsc = document.getElementById("order-asc");
+const orderDes = document.getElementById("order-desc");
 const favoriteMoviesArr = [];
 let maxDisplayMovies = 40;
 const movies = [];
-const moviesPromises = [];
+const moviesMain = [];
 let isFavoritesOn = false;
 
 /*API Authentication options */
@@ -42,19 +44,31 @@ const getMovieList = async (maxMovies) => {
     if (favoriteMoviesArr.find((movie) => movie.id == i)) {
       continue;
     } else {
-      makeAPICall(i).then((movie) => generateCard(movie));
+      makeAPICall(i).then((movie) => {
+        moviesMain.push(movie);
+        generateCard(movie);
+      });
     }
   }
 };
-const displayFavoritesHandler = (isFavoritesOn) => {
-  favoriteListButton.classList.add("favorites-ON");
-  console.log("faves is ON ");
-  titleOfPage.innerHTML = "Your Favorite Movies Are: ";
-  movieListContainer.innerHTML = "";
-  console.log("the length of the array is: " + favoriteMoviesArr.length);
-  favoriteMoviesArr.map((movie) => {
-    makeAPICall(movie.id).then((res) => generateCard(res));
-  });
+const displayFavoritesHandler = () => {
+  console.log(favoriteMoviesArr.length);
+  if (favoriteMoviesArr.length === 0) {
+    console.log("we are here");
+    movieListContainer.innerHTML = `NO MOVIES ADDED YET, PLEASE CLICK THE HEART ICON ON
+     MOVIE CARDS TO ADD TO THIS LIST `;
+    movieListContainer.classList.add("empty");
+    console.log("but nothing happened");
+  } else {
+    favoriteListButton.classList.add("favorites-ON");
+    console.log("faves is ON ");
+    titleOfPage.innerHTML = "Your Favorite Movies Are: ";
+    movieListContainer.innerHTML = "";
+    console.log("the length of the array is: " + favoriteMoviesArr.length);
+    favoriteMoviesArr.map((movie) => {
+      makeAPICall(movie.id).then((res) => generateCard(res));
+    });
+  }
 };
 
 favoriteListButton.addEventListener("click", () => {
@@ -64,6 +78,7 @@ favoriteListButton.addEventListener("click", () => {
   } else {
     favoriteListButton.classList.remove("favorites-ON");
     console.log("FAVES IS OFF");
+    movieListContainer.classList.remove("empty");
     movieListContainer.innerHTML = "";
     getMovieList(30);
     titleOfPage.innerHTML = "Back To Normal Pages";
@@ -181,3 +196,12 @@ const addToFavoritesHandler = (favoritedMovie) => {
     console.log(favoriteMoviesArr);
   }
 };
+
+//event listener
+
+orderAsc.addEventListener("click", () => {});
+
+orderDes.addEventListener("click", () => {
+  movieListContainer.innerHTML = `we are ordering from Z to A`;
+  movieListContainer.classList.add("empty");
+});

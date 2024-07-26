@@ -92,6 +92,13 @@ i {
   gap: 2.5rem;
 }
 
+.movie-list.empty {
+  color: red;
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
 .movie-card {
   border-radius: 20px;
   position: relative;
