@@ -11,6 +11,8 @@ let maxDisplayMovies = 40;
 const movies = [];
 const moviesMain = [];
 let isFavoritesOn = false;
+let isAtoZOn = false;
+let isZtoAOn = false;
 
 /*API Authentication options */
 const options = {
@@ -199,7 +201,28 @@ const addToFavoritesHandler = (favoritedMovie) => {
 
 //event listener
 
-orderAsc.addEventListener("click", () => {});
+const orderingAlphabeticallyFromAtoZ = (allMovies) => {
+  console.log(allMovies);
+  const allMoviesElements = allMovies.children;
+  const allMoviesArr = Array.from(allMoviesElements);
+  console.log("the following is the array: ");
+  allMoviesArr.sort((a, b) =>
+    a.children[2].children[0].innerHTML.localeCompare(
+      b.children[2].children[0].innerHTML
+    )
+  );
+  movieListContainer.innerHTML = "";
+  allMoviesArr.map((element) => movieListContainer.appendChild(element));
+};
+
+orderAsc.addEventListener("click", () => {
+  if (!isAtoZOn) {
+    isAtoZOn = true;
+    orderingAlphabeticallyFromAtoZ(movieListContainer);
+  } else {
+    isAtoZOn = false;
+  }
+});
 
 orderDes.addEventListener("click", () => {
   movieListContainer.innerHTML = `we are ordering from Z to A`;
