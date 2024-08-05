@@ -2,10 +2,12 @@
 const myKey = config.MY_KEY;
 const readAccessToken = config.API_READ_ACCESS_TOKEN;
 const favoriteListButton = document.getElementById("favorites-button");
+const fromAtoZbutton = document.getElementById("order-asc");
 const titleOfPage = document.querySelector(".title");
 const movieListContainer = document.querySelector(".movie-list");
 const orderAsc = document.getElementById("order-asc");
 const orderDes = document.getElementById("order-desc");
+const homeButton = document.getElementById("home-button");
 const favoriteMoviesArr = [];
 let maxDisplayMovies = 40;
 const movies = [];
@@ -201,30 +203,45 @@ const addToFavoritesHandler = (favoritedMovie) => {
 
 //event listener
 
-const orderingAlphabeticallyFromAtoZ = (allMovies) => {
+const orderingAlphabetically = (allMovies) => {
   console.log(allMovies);
+
   const allMoviesElements = allMovies.children;
   const allMoviesArr = Array.from(allMoviesElements);
   console.log("the following is the array: ");
-  allMoviesArr.sort((a, b) =>
-    a.children[2].children[0].innerHTML.localeCompare(
-      b.children[2].children[0].innerHTML
-    )
-  );
+  //a is for the movie1, b is for movie2
+  if (isAtoZOn) {
+    allMoviesArr.sort((a, b) =>
+      a.children[2].children[0].innerHTML.localeCompare(
+        b.children[2].children[0].innerHTML
+      )
+    );
+  } else {
+    allMoviesArr.sort((a, b) =>
+      b.children[2].children[0].innerHTML.localeCompare(
+        a.children[2].children[0].innerHTML
+      )
+    );
+  }
   movieListContainer.innerHTML = "";
   allMoviesArr.map((element) => movieListContainer.appendChild(element));
 };
 
 orderAsc.addEventListener("click", () => {
-  if (!isAtoZOn) {
-    isAtoZOn = true;
-    orderingAlphabeticallyFromAtoZ(movieListContainer);
-  } else {
+  if (isAtoZOn) {
     isAtoZOn = false;
+  } else {
+    isAtoZOn = true;
   }
+  fromAtoZbutton.classList.add("favorites-ON");
+  orderingAlphabetically(movieListContainer);
 });
 
-orderDes.addEventListener("click", () => {
-  movieListContainer.innerHTML = `we are ordering from Z to A`;
-  movieListContainer.classList.add("empty");
+homeButton.addEventListener("click", () => {
+  isFavoritesOn = false;
+  isAtoZOn = false;
+  fromAtoZbutton.classList.remove("favorites-ON");
+  favoriteListButton.classList.remove("favorites-ON");
+  movieListContainer.innerHTML = "";
+  getMovieList(30);
 });
