@@ -50,15 +50,36 @@ body {
 i {
   color: black;
 }
-.search-field {
-  border: 1px solid transparent;
-  border-radius: 0.59rem;
-  width: 100%;
-  height: 2rem;
-  outline: none;
-  padding-left: 1rem;
+.hamburger {
+  position: relative;
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  margin: 10px;
 }
 
+.hamburger span {
+  display: block;
+  width: 100%;
+  height: 5px;
+  border: 1px solid black;
+  background-color: white;
+  transition: all 0.3s;
+}
+
+.bar-rotate-left {
+  position: absolute;
+  transform: rotate(45deg);
+}
+.bar-rotate-right {
+  transform: rotate(-45deg);
+}
+.hamburger span.remove-line {
+  display: none;
+}
 .nav .options ul {
   display: flex;
   list-style: none;
@@ -71,7 +92,7 @@ i {
 }
 
 .nav .options .favorites-ON {
-  color: white;
+  color: #f1c2f3;
 }
 
 /*Title div starts here*/
@@ -85,7 +106,6 @@ i {
 
 .movie-list {
   width: 100%;
-  height: 1500px;
   background-color: rgb(37, 37, 37);
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -158,4 +178,45 @@ i {
 .movie-description .movie-summary {
   font-size: 1.2rem;
   color: var(--movie-desc-text-color);
+}
+
+/*media queries*/
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .movie-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media screen and (min-width: 350px) and (max-width: 720px) {
+  .nav {
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  .hamburger {
+    display: block;
+  }
+
+  .options {
+    display: none;
+  }
+  .options.active {
+    display: flex;
+  }
+
+  .options.active ul {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .options.active ul li {
+    border: 1px solid black;
+  }
+  .movie-list {
+    grid-template-columns: 1fr;
+  }
+
+  .movie-card {
+    max-height: 500px;
+  }
 }

@@ -8,6 +8,11 @@ const movieListContainer = document.querySelector(".movie-list");
 const orderAsc = document.getElementById("order-asc");
 const orderDes = document.getElementById("order-desc");
 const homeButton = document.getElementById("home-button");
+const hamburgerBtn = document.getElementById("hamburger");
+const navMenu = document.getElementById("options");
+const hamburgerBar1 = document.getElementById("bar1");
+const hamburgerBar2 = document.getElementById("bar2");
+const hamburgerBar3 = document.getElementById("bar3");
 const favoriteMoviesArr = [];
 let maxDisplayMovies = 40;
 const movies = [];
@@ -240,8 +245,22 @@ orderAsc.addEventListener("click", () => {
 homeButton.addEventListener("click", () => {
   isFavoritesOn = false;
   isAtoZOn = false;
+  movieListContainer.classList.remove("empty");
   fromAtoZbutton.classList.remove("favorites-ON");
   favoriteListButton.classList.remove("favorites-ON");
   movieListContainer.innerHTML = "";
   getMovieList(30);
+});
+
+hamburgerBtn.addEventListener("click", () => {
+  navMenu.classList.toggle("active");
+  if (navMenu.classList.contains("active")) {
+    hamburgerBar1.classList.add("remove-line");
+    hamburgerBar2.classList.add("bar-rotate-left");
+    hamburgerBar3.classList.add("bar-rotate-right");
+  } else {
+    hamburgerBar1.classList.remove("remove-line");
+    hamburgerBar2.classList.remove("bar-rotate-left");
+    hamburgerBar3.classList.remove("bar-rotate-right");
+  }
 });

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
     <link rel="stylesheet" href="/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <title>Movies API</title>
@@ -18,11 +18,12 @@
                     src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_1-5bdc75aaebeb75dc7ae79426ddd9be3b2be1e342510f8202baf6bffa71d7f5c4.svg"
                     alt="">
             </div>
-            <div class="search">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="search" class="search-field">
+            <div class="hamburger" id="hamburger">
+                <span id="bar1"></span>
+                <span id="bar2"></span>
+                <span id="bar3"></span>
             </div>
-            <div class="options">
+            <div class="options" id="options">
                 <ul>
                     <a href="#" id="favorites-button">
                         <li>Favorites</li>
