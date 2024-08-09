@@ -5,8 +5,6 @@ const favoriteListButton = document.getElementById("favorites-button");
 const fromAtoZbutton = document.getElementById("order-asc");
 const titleOfPage = document.querySelector(".title");
 const movieListContainer = document.querySelector(".movie-list");
-const orderAsc = document.getElementById("order-asc");
-const orderDes = document.getElementById("order-desc");
 const homeButton = document.getElementById("home-button");
 const hamburgerBtn = document.getElementById("hamburger");
 const navMenu = document.getElementById("options");
@@ -32,8 +30,8 @@ const options = {
 
 /*requesting API Data*/
 
-const makeAPICall = async (index) => {
-  return await fetch(`https://api.themoviedb.org/3/movie/${index}`, options)
+const makeAPICall = (index) => {
+  return fetch(`https://api.themoviedb.org/3/movie/${index}`, options)
     .then((res) => {
       if (!res.ok) {
         throw new Error(`Movie was not in DataBase`);
@@ -45,33 +43,57 @@ const makeAPICall = async (index) => {
 };
 
 const getMovieList = async (maxMovies) => {
-  console.log(
-    "this is the total amount of movies that is going to display: " + maxMovies
-  );
+  const promisesOfMovies = [];
+  console.log(favoriteMoviesArr[0]);
   for (i = 1; i < maxMovies; i++) {
-    console.log("max movies inside the for loop: " + maxMovies);
     if (favoriteMoviesArr.find((movie) => movie.id == i)) {
       continue;
     } else {
-      makeAPICall(i).then((movie) => {
-        moviesMain.push(movie);
-        generateCard(movie);
-      });
+      promisesOfMovies.push(makeAPICall(i));
     }
   }
+  await Promise.allSettled(promisesOfMovies).then((promise) =>
+    promise.map((promise) => {
+      if (promise.value === undefined) {
+        console.log("NO MOVIE");
+      } else {
+        console.log(promise.value);
+        generateCard(promise.value);
+      }
+    })
+  );
 };
+
+//THIS WORKS DON'T TOUCH IT
+// const getMovieList = async (maxMovies) => {
+//   console.log(
+//     "this is the total amount of movies that is going to display: " + maxMovies
+//   );
+//   for (i = 1; i < maxMovies; i++) {
+//     console.log("max movies inside the for loop: " + maxMovies);
+//     if (favoriteMoviesArr.find((movie) => movie.id == i)) {
+//       continue;
+//     } else {
+//       await makeAPICall(i).then((movie) => {
+//         moviesMain.push(movie);
+//         generateCard(movie);
+//       });
+//     }
+//   }
+// };
 const displayFavoritesHandler = () => {
   console.log(favoriteMoviesArr.length);
   if (favoriteMoviesArr.length === 0) {
-    console.log("we are here");
     movieListContainer.innerHTML = `NO MOVIES ADDED YET, PLEASE CLICK THE HEART ICON ON
      MOVIE CARDS TO ADD TO THIS LIST `;
     movieListContainer.classList.add("empty");
-    console.log("but nothing happened");
   } else {
     favoriteListButton.classList.add("favorites-ON");
     console.log("faves is ON ");
-    titleOfPage.innerHTML = "Your Favorite Movies Are: ";
+    titleOfPage.innerHTML = "";
+    titleDesc = document.createElement("h2");
+    titleDesc.innerHTML = "Your Favorite Movies Are: ";
+    titleOfPage.appendChild(titleDesc);
     movieListContainer.innerHTML = "";
     console.log("the length of the array is: " + favoriteMoviesArr.length);
     favoriteMoviesArr.map((movie) => {
@@ -79,21 +101,6 @@ const displayFavoritesHandler = () => {
     });
   }
 };
-
-favoriteListButton.addEventListener("click", () => {
-  if (!isFavoritesOn) {
-    displayFavoritesHandler(isFavoritesOn);
-    isFavoritesOn = true;
-  } else {
-    favoriteListButton.classList.remove("favorites-ON");
-    console.log("FAVES IS OFF");
-    movieListContainer.classList.remove("empty");
-    movieListContainer.innerHTML = "";
-    getMovieList(30);
-    titleOfPage.innerHTML = "Back To Normal Pages";
-    isFavoritesOn = false;
-  }
-});
 
 /**Generate Card Function Starts here:
  *  the function receives an object containing the movie information that we got from
@@ -159,7 +166,7 @@ const generateCard = (movie) => {
     movieCard.style.backgroundImage = `url("https://image.tmdb.org/t/p/w500${movie.poster_path}")`;
   }
   heartIcon.addEventListener("click", (event) => {
-    addToFavoritesHandler(event.target.parentElement);
+    manageFavoritesHandler(event.target.parentElement);
   });
 };
 getMovieList(maxDisplayMovies);
@@ -178,7 +185,7 @@ getMovieList(maxDisplayMovies);
 and to display the correct movies in the home page so it doesn't include any movie that is
 already in the array */
 
-const addToFavoritesHandler = (favoritedMovie) => {
+const manageFavoritesHandler = (favoritedMovie) => {
   console.log("NOTICE ME: " + movieListContainer.childNodes.length);
   maxDisplayMovies += 2;
   if (
@@ -188,7 +195,7 @@ const addToFavoritesHandler = (favoritedMovie) => {
   ) {
     favoriteMoviesArr.push(favoritedMovie);
     movieListContainer.innerHTML = "";
-    console.log(favoriteMoviesArr);
+    //console.log(favoriteMoviesArr);
     getMovieList(maxDisplayMovies);
   } else {
     console.log("we are deleting the movie");
@@ -205,9 +212,6 @@ const addToFavoritesHandler = (favoritedMovie) => {
     console.log(favoriteMoviesArr);
   }
 };
-
-//event listener
-
 const orderingAlphabetically = (allMovies) => {
   console.log(allMovies);
 
@@ -232,7 +236,29 @@ const orderingAlphabetically = (allMovies) => {
   allMoviesArr.map((element) => movieListContainer.appendChild(element));
 };
 
-orderAsc.addEventListener("click", () => {
+//event listeners
+
+favoriteListButton.addEventListener("click", () => {
+  if (!isFavoritesOn) {
+    displayFavoritesHandler(isFavoritesOn);
+    fromAtoZbutton.classList.remove("favorites-ON");
+    isFavoritesOn = true;
+  } else {
+    favoriteListButton.classList.remove("favorites-ON");
+    console.log("FAVES IS OFF");
+    movieListContainer.classList.remove("empty");
+    movieListContainer.innerHTML = "";
+    titleOfPage.innerHTML = "";
+    titleDesc = document.createElement("h2");
+    titleDesc.innerHTML = "Choose Your Favorites Movies:  ";
+    titleOfPage.appendChild(titleDesc);
+    fromAtoZbutton.classList.remove("favorites-ON");
+    getMovieList(30);
+    isFavoritesOn = false;
+  }
+});
+
+fromAtoZbutton.addEventListener("click", () => {
   if (isAtoZOn) {
     isAtoZOn = false;
   } else {
@@ -248,6 +274,10 @@ homeButton.addEventListener("click", () => {
   movieListContainer.classList.remove("empty");
   fromAtoZbutton.classList.remove("favorites-ON");
   favoriteListButton.classList.remove("favorites-ON");
+  titleOfPage.innerHTML = "";
+  titleDesc = document.createElement("h2");
+  titleDesc.innerHTML = "Chose Your Favorite Movies:  ";
+  titleOfPage.appendChild(titleDesc);
   movieListContainer.innerHTML = "";
   getMovieList(30);
 });
