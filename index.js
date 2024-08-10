@@ -46,7 +46,6 @@ const makeAPICall = (index) => {
 const getMovieList = async (maxMovies) => {
   const promisesOfMovies = [];
   favoriteListButton.classList.add("no-touch");
-  console.log(favoriteMoviesArr);
   for (i = 1; i < maxMovies; i++) {
     if (favoriteMoviesArr.find((movie) => movie == i)) {
       continue;
@@ -66,38 +65,19 @@ const getMovieList = async (maxMovies) => {
   favoriteListButton.classList.remove("no-touch");
 };
 
-//THIS WORKS DON'T TOUCH IT
-// const getMovieList = async (maxMovies) => {
-//   console.log(
-//     "this is the total amount of movies that is going to display: " + maxMovies
-//   );
-//   for (i = 1; i < maxMovies; i++) {
-//     console.log("max movies inside the for loop: " + maxMovies);
-//     if (favoriteMoviesArr.find((movie) => movie.id == i)) {
-//       continue;
-//     } else {
-//       await makeAPICall(i).then((movie) => {
-//         moviesMain.push(movie);
-//         generateCard(movie);
-//       });
-//     }
-//   }
-// };
 const displayFavoritesHandler = () => {
-  console.log(favoriteMoviesArr.length);
   if (favoriteMoviesArr.length === 0) {
     movieListContainer.innerHTML = `NO MOVIES ADDED YET, PLEASE CLICK THE HEART ICON ON
      MOVIE CARDS TO ADD TO THIS LIST `;
     movieListContainer.classList.add("empty");
   } else {
     favoriteListButton.classList.add("favorites-ON");
-    console.log("faves is ON ");
+
     titleOfPage.innerHTML = "";
     titleDesc = document.createElement("h2");
     titleDesc.innerHTML = "Your Favorite Movies Are: ";
     titleOfPage.appendChild(titleDesc);
     movieListContainer.innerHTML = "";
-    console.log("the length of the array is: " + favoriteMoviesArr.length);
     favoriteMoviesArr.map((movie) => {
       makeAPICall(movie).then((res) => generateCard(res));
     });
@@ -183,35 +163,23 @@ getMovieList(maxDisplayMovies);
         if is not: it will push the selected movie into the array
 */
 
-/*NOTE TO SELF: we will need the array of favorite movies in the future to saved them to cache
-and to display the correct movies in the home page so it doesn't include any movie that is
-already in the array */
-
 const manageFavoritesHandler = (id) => {
-  console.log("NOTICE ME: " + movieListContainer.childNodes.length);
   maxDisplayMovies += 2;
   if (!favoriteMoviesArr.includes(id)) {
     favoriteMoviesArr.push(id);
     movieListContainer.innerHTML = "";
-    //console.log(favoriteMoviesArr);
     getMovieList(maxDisplayMovies);
   } else {
-    console.log("we are deleting the movie");
-    console.log(favoriteMoviesArr);
-    console.log(
-      favoriteMoviesArr.splice(
-        favoriteMoviesArr.indexOf(favoriteMoviesArr.find((item) => item == id)),
-        1
-      )
+    favoriteMoviesArr.splice(
+      favoriteMoviesArr.indexOf(favoriteMoviesArr.find((item) => item == id)),
+      1
     );
     displayFavoritesHandler(isFavoritesOn);
-    console.log(favoriteMoviesArr);
   }
 };
 const orderingAlphabetically = (allMovies) => {
   const allMoviesElements = allMovies.children;
   const allMoviesArr = Array.from(allMoviesElements);
-  console.log("the following is the array: ");
   //a is for the movie1, b is for movie2
   if (isAtoZOn) {
     allMoviesArr.sort((a, b) =>
@@ -231,7 +199,6 @@ const orderingAlphabetically = (allMovies) => {
 };
 
 const calculateTimeToWatch = () => {
-  console.log("we are calculating time");
   const totalWatchTimePromises = favoriteMoviesArr.map((movie) => {
     return makeAPICall(movie).then((information) => {
       return information.runtime;
@@ -279,7 +246,7 @@ favoriteListButton.addEventListener("click", () => {
     movieListContainer.innerHTML = "";
     titleOfPage.innerHTML = "";
     titleDesc = document.createElement("h2");
-    titleDesc.innerHTML = "Choose Your Favorites Movies:  ";
+    titleDesc.innerHTML = "Choose Your Favorites Movies: (click heart) ";
     titleOfPage.appendChild(titleDesc);
     fromAtoZbutton.classList.remove("favorites-ON");
     getMovieList(30);
@@ -313,7 +280,7 @@ homeButton.addEventListener("click", () => {
   resetClasses();
   titleOfPage.innerHTML = "";
   titleDesc = document.createElement("h2");
-  titleDesc.innerHTML = "Chose Your Favorite Movies:  ";
+  titleDesc.innerHTML = "Choose Your Favorite Movies: (click heart)  ";
   titleOfPage.appendChild(titleDesc);
   movieListContainer.innerHTML = "";
   getMovieList(30);
