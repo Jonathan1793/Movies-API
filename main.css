@@ -39,6 +39,10 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+.nav .home:hover {
+  cursor: pointer;
+}
 .nav img {
   width: 6rem;
 }
@@ -96,6 +100,11 @@ i {
 .nav .options .favorites-ON {
   color: #ff6f3d;
 }
+
+.nav .options .no-touch {
+  pointer-events: none;
+  color: grey;
+}
 hr {
   margin-top: 1rem;
 }
@@ -116,6 +125,17 @@ hr {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 2.5rem;
+}
+
+.movie-list.watch-time {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.movie-list.watch-time p {
+  color: red;
+  font-size: 5rem;
 }
 
 .movie-list.empty {
@@ -188,7 +208,7 @@ hr {
 }
 
 /*media queries*/
-@media screen and (min-width: 768px) and (max-width: 1024px) {
+@media screen and (min-width: 766px) and (max-width: 1024px) {
   .movie-list {
     grid-template-columns: 1fr 1fr;
   }

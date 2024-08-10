@@ -2,6 +2,7 @@
 const myKey = config.MY_KEY;
 const readAccessToken = config.API_READ_ACCESS_TOKEN;
 const favoriteListButton = document.getElementById("favorites-button");
+const didYouKnowButton = document.getElementById("did-you-know");
 const fromAtoZbutton = document.getElementById("order-asc");
 const titleOfPage = document.querySelector(".title");
 const movieListContainer = document.querySelector(".movie-list");
@@ -44,9 +45,10 @@ const makeAPICall = (index) => {
 
 const getMovieList = async (maxMovies) => {
   const promisesOfMovies = [];
-  console.log(favoriteMoviesArr[0]);
+  favoriteListButton.classList.add("no-touch");
+  console.log(favoriteMoviesArr);
   for (i = 1; i < maxMovies; i++) {
-    if (favoriteMoviesArr.find((movie) => movie.id == i)) {
+    if (favoriteMoviesArr.find((movie) => movie == i)) {
       continue;
     } else {
       promisesOfMovies.push(makeAPICall(i));
@@ -57,11 +59,11 @@ const getMovieList = async (maxMovies) => {
       if (promise.value === undefined) {
         console.log("NO MOVIE");
       } else {
-        console.log(promise.value);
         generateCard(promise.value);
       }
     })
   );
+  favoriteListButton.classList.remove("no-touch");
 };
 
 //THIS WORKS DON'T TOUCH IT
@@ -97,7 +99,7 @@ const displayFavoritesHandler = () => {
     movieListContainer.innerHTML = "";
     console.log("the length of the array is: " + favoriteMoviesArr.length);
     favoriteMoviesArr.map((movie) => {
-      makeAPICall(movie.id).then((res) => generateCard(res));
+      makeAPICall(movie).then((res) => generateCard(res));
     });
   }
 };
@@ -128,7 +130,7 @@ const generateCard = (movie) => {
 
   //adding necessary classes to elements created
 
-  if (favoriteMoviesArr.find((favoriteMovie) => favoriteMovie.id == movie.id)) {
+  if (favoriteMoviesArr.find((favoriteMovie) => favoriteMovie == movie.id)) {
     heartIcon.classList.add("fa-solid");
     heartIcon.classList.add("fa-heart-crack");
   } else {
@@ -165,8 +167,8 @@ const generateCard = (movie) => {
   } else {
     movieCard.style.backgroundImage = `url("https://image.tmdb.org/t/p/w500${movie.poster_path}")`;
   }
-  heartIcon.addEventListener("click", (event) => {
-    manageFavoritesHandler(event.target.parentElement);
+  heartIcon.addEventListener("click", () => {
+    manageFavoritesHandler(movie.id);
   });
 };
 getMovieList(maxDisplayMovies);
@@ -185,15 +187,11 @@ getMovieList(maxDisplayMovies);
 and to display the correct movies in the home page so it doesn't include any movie that is
 already in the array */
 
-const manageFavoritesHandler = (favoritedMovie) => {
+const manageFavoritesHandler = (id) => {
   console.log("NOTICE ME: " + movieListContainer.childNodes.length);
   maxDisplayMovies += 2;
-  if (
-    !favoriteMoviesArr.find(
-      (movieInFavorites) => movieInFavorites.id == favoritedMovie.id
-    )
-  ) {
-    favoriteMoviesArr.push(favoritedMovie);
+  if (!favoriteMoviesArr.includes(id)) {
+    favoriteMoviesArr.push(id);
     movieListContainer.innerHTML = "";
     //console.log(favoriteMoviesArr);
     getMovieList(maxDisplayMovies);
@@ -202,9 +200,7 @@ const manageFavoritesHandler = (favoritedMovie) => {
     console.log(favoriteMoviesArr);
     console.log(
       favoriteMoviesArr.splice(
-        favoriteMoviesArr.indexOf(
-          favoriteMoviesArr.find((item) => item.id == favoritedMovie.id)
-        ),
+        favoriteMoviesArr.indexOf(favoriteMoviesArr.find((item) => item == id)),
         1
       )
     );
@@ -213,8 +209,6 @@ const manageFavoritesHandler = (favoritedMovie) => {
   }
 };
 const orderingAlphabetically = (allMovies) => {
-  console.log(allMovies);
-
   const allMoviesElements = allMovies.children;
   const allMoviesArr = Array.from(allMoviesElements);
   console.log("the following is the array: ");
@@ -236,17 +230,52 @@ const orderingAlphabetically = (allMovies) => {
   allMoviesArr.map((element) => movieListContainer.appendChild(element));
 };
 
+const calculateTimeToWatch = () => {
+  console.log("we are calculating time");
+  const totalWatchTimePromises = favoriteMoviesArr.map((movie) => {
+    return makeAPICall(movie).then((information) => {
+      return information.runtime;
+    });
+  });
+
+  Promise.all(totalWatchTimePromises).then((runtimes) => {
+    const totalWatchTime = runtimes.reduce(
+      (totalSum, currentValue) => totalSum + currentValue,
+      0
+    );
+    displayDidYouKnowInfo(totalWatchTime);
+  });
+};
+
+const displayDidYouKnowInfo = (watchtime) => {
+  const hours = Math.floor(watchtime / 60);
+  const minutes = watchtime % 60;
+
+  let sentence = ` ${hours} ${hours === 1 ? "hour" : "hours"} `;
+  if (minutes > 0) {
+    sentence =
+      sentence + `and ${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
+  }
+  isFavoritesOn = false;
+  didYouKnowButton.classList.add("favorites-ON");
+  movieListContainer.innerHTML = "";
+  movieListContainer.classList.add("watch-time");
+  const labelForTime = document.createElement("h2");
+  const movieDuration = document.createElement("p");
+  movieDuration.innerHTML = sentence;
+  labelForTime.innerHTML = `The total amount of time required to watch all of your favorite movies is:  `;
+  movieListContainer.appendChild(labelForTime);
+  movieListContainer.appendChild(movieDuration);
+};
 //event listeners
 
 favoriteListButton.addEventListener("click", () => {
   if (!isFavoritesOn) {
+    resetClasses();
     displayFavoritesHandler(isFavoritesOn);
-    fromAtoZbutton.classList.remove("favorites-ON");
     isFavoritesOn = true;
   } else {
-    favoriteListButton.classList.remove("favorites-ON");
-    console.log("FAVES IS OFF");
-    movieListContainer.classList.remove("empty");
+    resetClasses();
     movieListContainer.innerHTML = "";
     titleOfPage.innerHTML = "";
     titleDesc = document.createElement("h2");
@@ -259,6 +288,7 @@ favoriteListButton.addEventListener("click", () => {
 });
 
 fromAtoZbutton.addEventListener("click", () => {
+  resetClasses();
   if (isAtoZOn) {
     isAtoZOn = false;
   } else {
@@ -268,12 +298,19 @@ fromAtoZbutton.addEventListener("click", () => {
   orderingAlphabetically(movieListContainer);
 });
 
+const resetClasses = () => {
+  movieListContainer.classList.remove("empty");
+  movieListContainer.classList.remove("watch-time");
+  fromAtoZbutton.classList.remove("favorites-ON");
+  favoriteListButton.classList.remove("favorites-ON");
+  didYouKnowButton.classList.remove("favorites-ON");
+  fromAtoZbutton.classList.remove("no-touch");
+};
+
 homeButton.addEventListener("click", () => {
   isFavoritesOn = false;
   isAtoZOn = false;
-  movieListContainer.classList.remove("empty");
-  fromAtoZbutton.classList.remove("favorites-ON");
-  favoriteListButton.classList.remove("favorites-ON");
+  resetClasses();
   titleOfPage.innerHTML = "";
   titleDesc = document.createElement("h2");
   titleDesc.innerHTML = "Chose Your Favorite Movies:  ";
@@ -293,4 +330,10 @@ hamburgerBtn.addEventListener("click", () => {
     hamburgerBar2.classList.remove("bar-rotate-left");
     hamburgerBar3.classList.remove("bar-rotate-right");
   }
+});
+
+didYouKnowButton.addEventListener("click", () => {
+  resetClasses();
+  fromAtoZbutton.classList.add("no-touch");
+  calculateTimeToWatch();
 });
