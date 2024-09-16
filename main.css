@@ -246,4 +246,20 @@ hr {
   .movie-card {
     max-height: 500px;
   }
+  .movie-card:focus .fa-heart {
+    display: block;
+  }
+  .movie-card:focus .fa-heart-crack {
+    display: block;
+  }
+  .movie-card:focus .movie-description {
+    display: block;
+    background-color: black;
+    opacity: 0.73;
+    color: var(--movie-desc-text-color);
+  }
+
+  .mobile-show {
+    display: block;
+  }
 }
