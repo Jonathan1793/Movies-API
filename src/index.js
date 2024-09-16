@@ -1,6 +1,5 @@
 /*global variables*/
-const myKey = config.MY_KEY;
-const readAccessToken = config.API_READ_ACCESS_TOKEN;
+const readAccessToken = import.meta.env.VITE_API_READ_ACCESS_TOKEN;
 const favoriteListButton = document.getElementById("favorites-button");
 const didYouKnowButton = document.getElementById("did-you-know");
 const fromAtoZbutton = document.getElementById("order-asc");
@@ -46,7 +45,7 @@ const makeAPICall = (index) => {
 const getMovieList = async (maxMovies) => {
   const promisesOfMovies = [];
   favoriteListButton.classList.add("no-touch");
-  for (i = 1; i < maxMovies; i++) {
+  for (let i = 1; i < maxMovies; i++) {
     if (favoriteMoviesArr.find((movie) => movie == i)) {
       continue;
     } else {
@@ -74,7 +73,7 @@ const displayFavoritesHandler = () => {
     favoriteListButton.classList.add("favorites-ON");
 
     titleOfPage.innerHTML = "";
-    titleDesc = document.createElement("h2");
+    const titleDesc = document.createElement("h2");
     titleDesc.innerHTML = "Your Favorite Movies Are: ";
     titleOfPage.appendChild(titleDesc);
     movieListContainer.innerHTML = "";
@@ -245,7 +244,7 @@ favoriteListButton.addEventListener("click", () => {
     resetClasses();
     movieListContainer.innerHTML = "";
     titleOfPage.innerHTML = "";
-    titleDesc = document.createElement("h2");
+    const titleDesc = document.createElement("h2");
     titleDesc.innerHTML = "Choose Your Favorites Movies: (click heart) ";
     titleOfPage.appendChild(titleDesc);
     fromAtoZbutton.classList.remove("favorites-ON");
@@ -279,7 +278,7 @@ homeButton.addEventListener("click", () => {
   isAtoZOn = false;
   resetClasses();
   titleOfPage.innerHTML = "";
-  titleDesc = document.createElement("h2");
+  const titleDesc = document.createElement("h2");
   titleDesc.innerHTML = "Choose Your Favorite Movies: (click heart)  ";
   titleOfPage.appendChild(titleDesc);
   movieListContainer.innerHTML = "";

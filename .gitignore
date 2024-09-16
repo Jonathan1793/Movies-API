@@ -3,6 +3,7 @@ package.json
 package-lock.json
 /node_modules
 .vscode
+.env
 
 MoviesAPI.rar
 MoviesAPI.txt
