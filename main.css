@@ -1,10 +1,11 @@
 /*Main attributes and major values*/
 :root {
-  --main-bg-color: #032541;
-  --main-text-color: #f2f2f2;
-  --nav-bg-color: #032541;
+  --main-bg-color: #1c1c1e;
+  --main-text-color: #f1f1f1;
+  --nav-bg-color: #1c1c1e;
   --movie-desc-text-color: rgb(177, 175, 175);
   --text-font-normal: "Montserrat", sans-serif;
+  /*#032541*/
 }
 
 *,
@@ -39,7 +40,13 @@ body {
   display: flex;
   flex-direction: column;
 }
-
+.title-header {
+  color: #bb86fc;
+  text-align: center;
+  font-size: 2rem;
+  width: 65%;
+  padding-left: 4rem;
+}
 .nav .home:hover {
   cursor: pointer;
 }
@@ -94,7 +101,13 @@ i {
 .nav .options a {
   font-family: var(--text-font-normal);
   text-decoration: none;
-  color: #00a676;
+  color: #ffffff;
+}
+
+.nav .options a:hover {
+  font-family: var(--text-font-normal);
+  text-decoration: none;
+  color: #bb86fc;
 }
 
 .nav .options .favorites-ON {
@@ -113,8 +126,9 @@ hr {
 .title {
   font-family: var(--text-font-normal);
   text-align: center;
+  font-size: 2rem;
   margin: 2rem 0;
-  color: #ffd700;
+  color: #ff4081;
 }
 
 /*movie display list css starts here*/
@@ -212,6 +226,9 @@ hr {
   .movie-list {
     grid-template-columns: 1fr 1fr;
   }
+  .title-header {
+    display: none;
+  }
 }
 
 @media screen and (min-width: 350px) and (max-width: 720px) {
@@ -261,5 +278,8 @@ hr {
 
   .mobile-show {
     display: block;
+  }
+  .title-header {
+    display: none;
   }
 }

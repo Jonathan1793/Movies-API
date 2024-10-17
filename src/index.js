@@ -303,3 +303,14 @@ didYouKnowButton.addEventListener("click", () => {
   fromAtoZbutton.classList.add("no-touch");
   calculateTimeToWatch();
 });
+
+document.querySelectorAll(".movie-card").forEach((element) => {
+  element.addEventListener("touchstart", () => {
+    element.classList.add("mobile-show");
+  });
+  element.addEventListener("touchend", () => {
+    element.classList.remove("mobile-show");
+  });
+});
+
+console.log(document.querySelectorAll(".movie-card"));
